@@ -86,10 +86,10 @@ databricks-ai-bridge==0.8.0
 databricks-connect==16.1.6
     # via unitycatalog-ai
 databricks-langchain==0.8.1
-    # via lakehouse-rag (pyproject.toml)
+    # via agenticlakehouse (pyproject.toml)
 databricks-sdk==0.67.0
     # via
-    #   lakehouse-rag (pyproject.toml)
+    #   agenticlakehouse (pyproject.toml)
     #   databricks-ai-bridge
     #   databricks-connect
     #   databricks-langchain
@@ -166,14 +166,14 @@ google-auth==2.41.1
     #   google-api-core
     #   google-genai
 google-genai==1.41.0
-    # via lakehouse-rag (pyproject.toml)
+    # via agenticlakehouse (pyproject.toml)
 googleapis-common-protos==1.70.0
     # via
     #   databricks-connect
     #   google-api-core
     #   grpcio-status
 gradio==5.49.0
-    # via lakehouse-rag (pyproject.toml)
+    # via agenticlakehouse (pyproject.toml)
 gradio-client==1.13.3
     # via gradio
 graphene==3.4.3
@@ -251,7 +251,7 @@ importlib-metadata==8.7.0
     #   mlflow-skinny
     #   opentelemetry-api
 ipykernel==6.30.1
-    # via lakehouse-rag (pyproject.toml)
+    # via agenticlakehouse (pyproject.toml)
 ipython==9.6.0
     # via ipykernel
 ipython-pygments-lexers==1.1.1
@@ -304,7 +304,7 @@ langchain==0.3.27
     #   unitycatalog-langchain
 langchain-community==0.3.30
     # via
-    #   lakehouse-rag (pyproject.toml)
+    #   agenticlakehouse (pyproject.toml)
     #   unitycatalog-langchain
 langchain-core==0.3.78
     # via
@@ -312,6 +312,7 @@ langchain-core==0.3.78
     #   langchain-community
     #   langchain-google-genai
     #   langchain-groq
+    #   langchain-mcp-adapters
     #   langchain-ollama
     #   langchain-tavily
     #   langchain-text-splitters
@@ -320,18 +321,20 @@ langchain-core==0.3.78
     #   langgraph-prebuilt
     #   langgraph-supervisor
 langchain-google-genai==2.1.12
-    # via lakehouse-rag (pyproject.toml)
+    # via agenticlakehouse (pyproject.toml)
 langchain-groq==0.3.8
-    # via lakehouse-rag (pyproject.toml)
+    # via agenticlakehouse (pyproject.toml)
+langchain-mcp-adapters==0.1.13
+    # via agenticlakehouse (pyproject.toml)
 langchain-ollama==0.3.10
-    # via lakehouse-rag (pyproject.toml)
+    # via agenticlakehouse (pyproject.toml)
 langchain-tavily==0.2.12
-    # via lakehouse-rag (pyproject.toml)
+    # via agenticlakehouse (pyproject.toml)
 langchain-text-splitters==0.3.11
     # via langchain
 langgraph==0.6.8
     # via
-    #   lakehouse-rag (pyproject.toml)
+    #   agenticlakehouse (pyproject.toml)
     #   langgraph-supervisor
 langgraph-checkpoint==2.1.1
     # via
@@ -342,10 +345,10 @@ langgraph-prebuilt==0.6.4
 langgraph-sdk==0.2.9
     # via langgraph
 langgraph-supervisor==0.0.29
-    # via lakehouse-rag (pyproject.toml)
+    # via agenticlakehouse (pyproject.toml)
 langsmith==0.4.32
     # via
-    #   lakehouse-rag (pyproject.toml)
+    #   agenticlakehouse (pyproject.toml)
     #   langchain
     #   langchain-community
     #   langchain-core
@@ -371,7 +374,10 @@ matplotlib-inline==0.1.7
     #   ipykernel
     #   ipython
 mcp==1.16.0
-    # via fastmcp
+    # via
+    #   agenticlakehouse (pyproject.toml)
+    #   fastmcp
+    #   langchain-mcp-adapters
 mdurl==0.1.2
     # via markdown-it-py
 mlflow==3.4.0
@@ -567,11 +573,11 @@ pyjwt==2.10.1
 pyparsing==3.2.5
     # via matplotlib
 pypdf==6.1.1
-    # via lakehouse-rag (pyproject.toml)
+    # via agenticlakehouse (pyproject.toml)
 pyperclip==1.11.0
     # via fastmcp
 pyprojroot==0.3.0
-    # via lakehouse-rag (pyproject.toml)
+    # via agenticlakehouse (pyproject.toml)
 python-dateutil==2.9.0.post0
     # via
     #   graphene
@@ -581,8 +587,9 @@ python-dateutil==2.9.0.post0
     #   unitycatalog-client
 python-dotenv==1.1.1
     # via
-    #   lakehouse-rag (pyproject.toml)
+    #   agenticlakehouse (pyproject.toml)
     #   fastmcp
+    #   mcp
     #   mlflow-skinny
     #   pydantic-settings
 python-multipart==0.0.20
@@ -697,7 +704,7 @@ storage3==2.21.1
 strenum==0.4.15
     # via supabase-functions
 supabase==2.21.1
-    # via lakehouse-rag (pyproject.toml)
+    # via agenticlakehouse (pyproject.toml)
 supabase-auth==2.21.1
     # via supabase
 supabase-functions==2.21.1
@@ -731,7 +738,9 @@ traitlets==5.14.3
     #   jupyter-core
     #   matplotlib-inline
 typer==0.19.2
-    # via gradio
+    # via
+    #   gradio
+    #   mcp
 typing-extensions==4.15.0
     # via
     #   aiosignal
@@ -749,6 +758,7 @@ typing-extensions==4.15.0
     #   huggingface-hub
     #   ipython
     #   langchain-core
+    #   langchain-mcp-adapters
     #   mlflow-skinny
     #   openai
     #   openapi-core
