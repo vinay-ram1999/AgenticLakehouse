@@ -1,6 +1,6 @@
 from langchain_core.messages import AnyMessage, HumanMessage, AIMessage, ToolMessage
 
-from typing import List, Generator
+from typing import List, Generator, AsyncGenerator
 
 from ..agents.backend import pretty_print_messages
 from ..load_config import LoadToolsConfig
@@ -9,7 +9,6 @@ from ..agents import build_graph
 
 TOOLS_CFG = LoadToolsConfig()
 
-graph = build_graph()
 config = {"configurable": {"thread_id": TOOLS_CFG.thread_id}}
 
 class ChatBot:
@@ -18,7 +17,15 @@ class ChatBot:
     The chatbot processes user messages, generates appropriate responses.
     """
     @staticmethod
-    def respond(chatbot: List, message: str) -> Generator:
+    async def get_graph():
+        """
+        Lazily initialize and cache the async graph.
+        """
+        graph = await build_graph()
+        return graph
+
+    @staticmethod
+    async def respond(chatbot: List, message: str) -> AsyncGenerator:
         """
         Processes a user message using the agent graph, generates a response, and appends it to the chat history.
         The chat history is also saved to a memory file for future reference.
@@ -35,10 +42,20 @@ class ChatBot:
             "content": message
         })
 
-        events = graph.stream({"messages": [("user", message)]}, config=config, stream_mode=["messages", "updates"])#, print_mode="values")
+        graph = await ChatBot.get_graph()
+
+        events = graph.astream(
+            {
+                "messages": [("user", message)]
+            }, 
+            config=config, 
+            stream_mode=["messages", "updates"],
+            # print_mode="values",
+        )
 
         event: AnyMessage
-        for event in events:
+        # for event in events:
+        async for event in events:
             if event[0] == "updates":
                 pretty_print_messages(event[1])
             elif event[0] == "messages":
