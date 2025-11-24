@@ -22,10 +22,10 @@ class LoadToolsConfig:
         self.web_search_agent_llm_temperature = app_config["web_search_agent"]["llm_temperature"]
 
         # Spark SQL Agent config
-        self.spark_sql_agent_name = app_config["spark_sql_agent"]["name"]
-        self.spark_sql_agent_llm = app_config["spark_sql_agent"]["llm"]
-        self.spark_sql_agent_llm_temperature = app_config["spark_sql_agent"]["llm_temperature"]
-        self.spark_sql_agent_step_timeout = app_config["spark_sql_agent"]["step_timeout"]
+        self.databricks_agent_name = app_config["databricks_agent"]["name"]
+        self.databricks_agent_llm = app_config["databricks_agent"]["llm"]
+        self.databricks_agent_llm_temperature = app_config["databricks_agent"]["llm_temperature"]
+        self.databricks_agent_step_timeout = app_config["databricks_agent"]["step_timeout"]
 
         # RAG Agent
         self.rag_agent_name = app_config["rag_agent"]["name"]

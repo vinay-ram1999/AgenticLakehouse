@@ -12,12 +12,15 @@ from dotenv import load_dotenv
 from typing import Literal
 import os
 
-from ...prompts.router import RAG_ROUTER_PROMPT
 from ...load_config import LoadToolsConfig
-
 
 load_dotenv()
 
+RAG_ROUTER_PROMPT = """
+You are an expert at routing a user question to a retriever or web search.
+The retriever is for a vectorstore that contains documents related to documentation of TPC-H data stored in Databricks Lakehouse.
+Use the retriever for questions on these topics. Otherwise, use web-search for collecting current information.
+"""
 TOOLS_CFG = LoadToolsConfig()
 
 SUPABASE_URL = os.environ.get("SUPABASE_URL")

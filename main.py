@@ -1,7 +1,6 @@
 import gradio as gr
 
-from src.assistant import ChatBot
-from src.utils import UISettings
+from src.agents.chatbot import ChatBot
 
 with gr.Blocks() as demo:
     with gr.Row() as row_one:
@@ -9,9 +8,8 @@ with gr.Blocks() as demo:
             [],
             elem_id="chatbot",
             type="messages",
-            height=650,
+            height=725,
         )
-        chatbot.like(UISettings.feedback, None, None) # **Adding like/dislike icons
 
     with gr.Row():
         input_txt = gr.Textbox(
