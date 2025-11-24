@@ -8,9 +8,18 @@ The application is built for rapid prototyping and deployment, running seamlessl
 
 The core of this application is a multi-agent workflow orchestrated by **LangGraph**. A central router agent assesses the user's request and routes it to the most appropriate specialist agent:
 
-* **Spark SQL Agent:** Interacts with Databricks Unity Catalog tables under a given `catalog` and `schema`. It uses the LangChain Spark SQL Toolkit to construct and execute queries against a Databricks Serverless SQL warehouse.
+* **Databricks Agent (MCP):** Interfaces with Databricks via the project's MCP (Model Control Plane) server. It uses the MCP server to retrieve Unity Catalog schema and table metadata and to execute SQL queries against configured Databricks endpoints. This provides a cleaner, extensible bridge to Databricks functionality (and replaces the previous `spark_sql`-only path when `DATABRICKS_MCP_HOST` is configured).
 * **RAG Agent:** Performs Retrieval-Augmented Generation. It sources documents from Unity Catalog Volumes, retrieves relevant chunks from a **Supabase** (PostgreSQL) vector store, and synthesizes an answer. *(Note: This workflow is still a work in progress).*
 * **Web Search Agent:** Uses the Tavily API to answer general knowledge or web-based questions.
+
+### MCP Server Integration
+
+This project includes integration with a dedicated MCP (Model Control Plane) server for Databricks. The Databricks agent can be configured to use the MCP server (via the `DATABRICKS_MCP_HOST` environment variable) to retrieve Unity Catalog schema and table metadata and to execute SQL queries. This replaces (or augments) the prior `spark_sql`-only workflow and provides a cleaner, extensible bridge to Databricks capabilities.
+
+- Current capabilities: schema discovery, table metadata retrieval, and SQL query execution via the MCP server.
+- Extensible to: MLflow experiments, Jobs monitoring, Unity Catalog administration, and other Databricks REST endpoints as needed.
+
+Databricks MCP: https://github.com/vinay-ram1999/databricks-mcp-server
 
 ### High-Level Diagram
 
@@ -82,6 +91,9 @@ DATABRICKS_SERVERLESS_COMPUTE_ID="auto"
 UC_CATALOG_NAME="catalog_name..."
 UC_SCHEMA_NAME="schema_name..."
 
+# Optional: MCP server endpoint (used by the Databricks agent)
+DATABRICKS_MCP_HOST="https://databricks-mcp-server-url.com/mcp"
+
 # LLM Provider (Choose one or both)
 GROQ_API_KEY="gsk_..."
 
@@ -118,13 +130,11 @@ This project uses `uv` for fast package management, but `pip` works as well.
 # Install uv if you don't have it
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# Create a virtual environment and install packages
-uv venv
-source .venv/bin/activate
-uv pip install -r requirements.txt
+# Sync the virtual environment
+uv sync
 
 # Run the Application
-uv run python main.py
+uv run main.py
 ```
 
 **Using `pip`:**
@@ -144,21 +154,26 @@ The Gradio app will now be running on `http://127.0.0.1:7860`.
 
 The long-term vision is to create a fully integrated, live "Lakehouse Agent" for the Databricks Workspace.
 
-* Allow users to select `catalog` and `schema` in the frontend before starting a chat/coversation (similar to Genie).
-* Reduce Spark query latency by allocating a dedicated compute cluster instead of using serverless compute if you know the application is used widely. 
-* Move Beyond Spark SQL: The current reliance on executing Spark SQL queries for metadata (e.g., "list tables") is a bottleneck. The next step is to leverage the Unity Catalog REST API directly, potentially maintaining an `MCP-server` for the agent to access all schema and metadata instantly.
-* MLFlow Integration: Extend the agent's capabilities to interact with MLFlow, allowing users to ask questions about model performance, compare runs, identify best-performing models, or retrieve feature importance.
-* Databricks Jobs Monitoring: Integrate with the Databricks Jobs API to enable monitoring, debugging, and optimization suggestions for your production pipelines.
-* Build an autonomous agent that periodically processes the entire Lakehouse metadata using the `MCP-server` and build knowledge graphs (GraphRAG) with lineage and other information which can be accessed by other agents to generate accurate responses.
+The MCP server integration described above has been implemented and is now used by the Databricks agent when `DATABRICKS_MCP_HOST` is configured. The MCP server currently provides schema discovery, table metadata retrieval, and SQL query execution.
 
-## Databricks App Demo
+Next priorities / roadmap:
+
+- **Expose catalog/schema selection in the UI:** let users pick the Unity Catalog `catalog` and `schema` before starting a conversation (similar to Genie).
+- **Extend MCP surface:** add endpoints and agent tooling for MLflow (experiments, runs, metrics), Jobs monitoring, Unity Catalog administration, and other Databricks REST features.
+- **Add authorization & secure deployment guides:** document recommended auth flows (OAuth/service principals) and production deployment options for the MCP server.
+- **Optimize query performance:** introduce caching and query planning improvements; evaluate dedicated compute for high-throughput use-cases.
+- **Observability & testing:** expand LangSmith tracing examples, add end-to-end tests for MCP endpoints, and include CI checks for the agent workflows.
+- **Docs & examples:** provide a short MCP server README, example requests, and a small Postman/HTTP collection for people to test the MCP API locally.
+
+If you'd like, I can add a short example showing how to set `DATABRICKS_MCP_HOST` locally, or replace the placeholder MCP repo link with your repo URL.
+
+## Databricks App Demo (Spark SQL Agent Version)
 
 - Query: List all tables available to query
 ![list_tables](images/list_tables.png)
 
 - Query: List the top 3 nations based on the total number of customers from that nation.
 ![query2](images/query2.png)
-<!-- ![query1](images/query1.png) -->
 
 - Query: Give me the weather forecast for Detroit, MI for this week in Celsius
 ![weather](images/web_search.png)
@@ -167,4 +182,4 @@ The long-term vision is to create a fully integrated, live "Lakehouse Agent" for
 ![langsmith](images/langsmith.png)
 
 - Supabase Vector Store:
-![supabase](images/supabase.png)
+![supabase](images/supabase.png) 

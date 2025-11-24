@@ -9,6 +9,9 @@ env:
   
   - name: 'UC_SCHEMA_NAME'
     value: 'bronze'
+
+  - name: 'DATABRICKS_MCP_HOST'
+    value: 'https://databricks-mcp-server.onrender.com/mcp'
   
   - name: 'GROQ_API_KEY'
     valueFrom: groq
