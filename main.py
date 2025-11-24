@@ -1,6 +1,6 @@
 import gradio as gr
 
-from src.assistant.chatbot import ChatBot
+from src.agents.chatbot import ChatBot
 from src.utils.ui_settings import UISettings
 
 with gr.Blocks() as demo:
