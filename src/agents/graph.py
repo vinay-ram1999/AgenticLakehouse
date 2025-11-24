@@ -23,7 +23,7 @@ from .tools.spark_sql import get_spark_sql_tools, SparkSQLResponse
 from .tools.tavily_search import load_tavily_search_tool
 from .tools.rag import load_supabase_retriever_tool
 from ..load_config import LoadToolsConfig
-from .backend import plot_agent_schema
+from .utils import plot_agent_schema
 
 TOOLS_CFG = LoadToolsConfig()
 
@@ -34,7 +34,7 @@ DATABRICKS_MCP_HOST = os.environ.get("DATABRICKS_MCP_HOST")
 
 async def build_graph() -> CompiledStateGraph:
     """Builds a graph with multi-agent supervisor architecture"""
-    async with streamablehttp_client(f"{DATABRICKS_MCP_HOST}/mcp") as (read, write, _):
+    async with streamablehttp_client(DATABRICKS_MCP_HOST) as (read, write, _):
         async with ClientSession(read, write) as session:
             await session.initialize()
 
