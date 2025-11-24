@@ -8,8 +8,8 @@ web_search_agent:
   llm: "openai/gpt-oss-120b"
   llm_temperature: 0.0
 
-spark_sql_agent:
-  name: "spark_sql_agent"
+databricks_agent:
+  name: "databricks_agent"
   llm: "openai/gpt-oss-120b"
   # llm: "llama-3.3-70b-versatile"
   llm_temperature: 0.0

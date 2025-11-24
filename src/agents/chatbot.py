@@ -15,17 +15,17 @@ from langchain_mcp_adapters.prompts import load_mcp_prompt
 from langchain_mcp_adapters.tools import load_mcp_tools
 from mcp import ClientSession
 
-from typing import List, Generator, AsyncGenerator
+from typing import List, AsyncGenerator
 import os
 
 from ..prompts.web_search import SYSTEM_PROMPT as WEB_SEARCH_SYS_PROMPT
-from ..prompts.spark_sql import SYSTEM_PROMPT as SPARK_SQL_SYS_PROMPT
+from ..prompts.databricks import SYSTEM_PROMPT as DATABRICKS_SYS_PROMPT
 from ..prompts.router import SYSTEM_PROMPT as ROUTER_PROMPT
-from .tools.spark_sql import get_spark_sql_tools, SparkSQLResponse
+from .utils import plot_agent_schema, pretty_print_messages
 from .tools.tavily_search import load_tavily_search_tool
 from .tools.rag import load_supabase_retriever_tool
 from ..load_config import LoadToolsConfig
-from .utils import plot_agent_schema, pretty_print_messages
+
 
 TOOLS_CFG = LoadToolsConfig()
 
@@ -79,30 +79,28 @@ class ChatBot:
                     name=TOOLS_CFG.web_search_agent_name
                 )
 
-                spark_sql_agent_llm = ChatGroq(model=TOOLS_CFG.spark_sql_agent_llm, temperature=TOOLS_CFG.spark_sql_agent_llm_temperature)
-                # spark_sql_agent_llm = ChatOllama(model="gpt-oss:120b-cloud", temperature=TOOLS_CFG.spark_sql_agent_llm_temperature) #NOTE local dev only
+                databricks_agent_llm = ChatGroq(model=TOOLS_CFG.databricks_agent_llm, temperature=TOOLS_CFG.databricks_agent_llm_temperature)
+                # databricks_agent_llm = ChatOllama(model="gpt-oss:120b-cloud", temperature=TOOLS_CFG.databricks_agent_llm_temperature) #NOTE local dev only
                 
-                # spark_sql_tools = get_spark_sql_tools(spark_sql_agent_llm) + [SparkSQLResponse]
-                spark_sql_tools = await load_mcp_tools(session, server_name="databricks_mcp_server")
+                databricks_tools = await load_mcp_tools(session, server_name="databricks_mcp_server")
 
-                spark_sql_agent_prompt = ChatPromptTemplate([
-                        ("system", SPARK_SQL_SYS_PROMPT.format(**{"CATALOG_NAME": CATALOG, "SCHEMA_NAME": SCHEMA})),
+                databricks_agent_prompt = ChatPromptTemplate([
+                        ("system", DATABRICKS_SYS_PROMPT.format(**{"CATALOG_NAME": CATALOG, "SCHEMA_NAME": SCHEMA})),
                         ("placeholder", "{messages}"),
                         ("placeholder", "{agent_scratchpad}"),
                 ])
 
-                spark_sql_agent = create_react_agent(
-                    model=spark_sql_agent_llm, 
-                    tools=spark_sql_tools, 
-                    prompt=spark_sql_agent_prompt, 
-                    name=TOOLS_CFG.spark_sql_agent_name
+                databricks_agent = create_react_agent(
+                    model=databricks_agent_llm, 
+                    tools=databricks_tools, 
+                    prompt=databricks_agent_prompt, 
+                    name=TOOLS_CFG.databricks_agent_name
                 )
 
                 router_llm = ChatGroq(model=TOOLS_CFG.router_agent_llm, temperature=TOOLS_CFG.router_agent_llm_temperature)
                 # router_llm = ChatOllama(model="gpt-oss:120b-cloud", temperature=TOOLS_CFG.router_agent_llm_temperature) #NOTE local dev only
-                retriever_tool = load_supabase_retriever_tool()
 
-                agents = [spark_sql_agent, web_search_agent]
+                agents = [databricks_agent, web_search_agent]
                 agent_names = [agent.name for agent in agents]
                 
                 handoff_tools = [
@@ -139,7 +137,8 @@ class ChatBot:
                 memory = MemorySaver()
                 graph = builder.compile(checkpointer=memory)
                 
-                # plot_agent_schema(graph, "router_agent")
+                ## Plot the final graph
+                plot_agent_schema(graph, "router_agent")
 
                 ## Invoke graph
                 events = graph.astream(
