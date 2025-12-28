@@ -21,9 +21,12 @@ This project includes integration with a dedicated MCP (Model Control Plane) ser
 
 Databricks MCP: https://github.com/vinay-ram1999/databricks-mcp-server
 
-### High-Level Diagram
+### Workflow Diagram
 
-![Architecture Diagram](images/AgenticLakehouse.png)
+<!-- ![Architecture Diagram](images/AgenticLakehouse.png) -->
+
+![Workflow Diagram](images/AgenticLakehouse_workflow.png)
+
 
 ### LangGraph Workflow (As of Now)
 
